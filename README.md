@@ -67,8 +67,8 @@ If you want to change the *very first* default location that loads when the app 
         window.INITIAL_DEFAULT_LOCATION = {
             id: 'default-home',
             name: 'Your City Name Here', // <-- Change this
-            latitude: 35.7000151078977,   // <-- Change this (Example: Your Latitude)
-            longitude: 51.33753626310464  // <-- Change this (Example: Your Longitude)
+            latitude: 35.7000151078977,   // <-- Change this (Example: Your Latitude)-DON'T forget the comma character
+            longitude: 51.33753626310464  // <-- Change this (Example: Your Longitude)-No need to  comma character here
         };
     </script>
     ```
