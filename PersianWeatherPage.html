@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>وضعیت آب و هوا </title>
+
+    <!-- Bootstrap CSS (v4.6) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Google Font Vazirmatn -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --body-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --settings-card-bg: #ffffff;
+            --text-color: #212529;
+            --text-muted-color: #6c757d;
+            --primary-color: #007bff;
+            --primary-light-bg: #e7f3ff;
+            --border-color: #dee2e6;
+            --input-bg: #ffffff;
+            --input-border: #ced4da;
+            --error-color: #dc3545;
+            --border-radius: 15px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition-speed: 0.3s;
+            --past-opacity: 0.6;
+            --icon-color-muted: #888;
+        }
+
+        /* --- Dark Mode --- */
+        body.dark-mode {
+            --body-bg: #1a1a1a;
+            --card-bg: #2c2c2c;
+            --settings-card-bg: #333333;
+            --text-color: #e8eaed;
+            --text-muted-color: #9aa0a6;
+            --primary-color: #5e9bff;
+            --primary-light-bg: #283a50;
+            --border-color: #444;
+            --input-bg: #333;
+            --input-border: #555;
+            --error-color: #f28b82;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --icon-color-muted: #aaa;
+        }
+        body.dark-mode .hourly-card { background-color: #404040; border-color: #555; }
+        body.dark-mode .hourly-card .extra-info span, body.dark-mode .daily-card .extra-info span { color: var(--text-muted-color); }
+        body.dark-mode .hourly-card .extra-info .fas, body.dark-mode .daily-card .extra-info .fas { color: var(--icon-color-muted); }
+        body.dark-mode .hourly-card.is-past { background-color: #353535; opacity: var(--past-opacity); }
+        body.dark-mode .hourly-card.is-current { background-color: var(--primary-color); border-color: var(--primary-color); color: #1a1a1a; }
+        body.dark-mode .hourly-card.is-current .time, body.dark-mode .hourly-card.is-current .temp, body.dark-mode .hourly-card.is-current .hourly-desc, body.dark-mode .hourly-card.is-current .extra-info .feels-label, body.dark-mode .hourly-card.is-current .extra-info span, body.dark-mode .hourly-card.is-current .extra-info .fas { color: #ffffff !important; }
+        body.dark-mode .form-control, body.dark-mode .custom-select { background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color); }
+        body.dark-mode .form-control::placeholder { color: var(--text-muted-color); }
+        body.dark-mode .alert-info { background-color: #283a50; border-color: #5e9bff; color: #cde0ff; }
+        body.dark-mode .alert-danger { background-color: #5c2b2b; border-color: #f28b82; color: #fbd9d5; }
+        body.dark-mode .btn-link { color: var(--primary-color); }
+        body.dark-mode .btn-primary { background-color: var(--primary-color); border-color: var(--primary-color); color: #fff; }
+        body.dark-mode .btn-secondary { background-color: #5f6368; border-color: #5f6368; color: #fff; }
+        body.dark-mode .btn-danger { background-color: #d9534f; border-color: #d9534f; }
+        body.dark-mode .card { background-color: var(--card-bg); border-color: var(--border-color); }
+        body.dark-mode .weather-card-main { background-color: var(--card-bg); border-color: var(--border-color); }
+        body.dark-mode .daily-card { background-color: var(--card-bg); }
+        body.dark-mode .settings-card { background-color: var(--settings-card-bg); border-color: var(--border-color); }
+        body.dark-mode .current-weather { border-bottom-color: var(--border-color); }
+        body.dark-mode .forecast-section h3 { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+        body.dark-mode footer a { color: var(--primary-color); }
+        body.dark-mode footer .designer-info a { color: var(--body-bg); }
+        body.dark-mode .current-weather .details span { color: var(--text-color); }
+        body.dark-mode .current-weather .details .detail-label { color: var(--text-muted-color); }
+        body.dark-mode .daily-card .temps .min-temp { color: var(--text-muted-color); }
+        body.dark-mode footer { color: var(--text-muted-color); }
+        body.dark-mode footer .source-info, body.dark-mode footer .source-info a { color: var(--text-muted-color); }
+        body.dark-mode footer .source-info a:hover { color: var(--primary-color); }
+        body.dark-mode .settings-card label { color: var(--text-color); }
+
+        /* --- General Styles --- */
+        html { height: 100%; }
+        body { font-family: 'Vazirmatn', sans-serif; background-color: var(--body-bg); color: var(--text-color); font-size: 16px; line-height: 1.7; min-height: 100%; display: flex; flex-direction: column; transition: background-color var(--transition-speed), color var(--transition-speed); }
+        .main-content { flex: 1 0 auto; }
+        .container { max-width: 900px; }
+
+        /* Settings Card */
+        .settings-card { margin-top: 1.5rem; margin-bottom: 1rem; background-color: var(--settings-card-bg); border-radius: var(--border-radius); box-shadow: var(--box-shadow); border: 1px solid var(--border-color); transition: background-color var(--transition-speed), border-color var(--transition-speed); }
+        .settings-card .card-header { background-color: transparent; border-bottom: 1px solid var(--border-color); padding: 0.75rem 1.25rem; display: flex; justify-content: space-between; align-items: center; }
+        .settings-card .btn-link { font-weight: 500; text-decoration: none; color: var(--text-color); font-size: 1.1em; padding: 0; transition: color var(--transition-speed); display: inline-flex; align-items: center; }
+        body.dark-mode .settings-card .btn-link { color: var(--text-color); }
+        .settings-card .btn-link .fas.fa-cog { margin-right: 0.5rem; }
+        .settings-card .card-body { padding: 1.5rem; transition: background-color var(--transition-speed); }
+        .settings-card .form-group label { font-weight: 500; margin-bottom: .3rem; display: block; text-align: right; }
+        .settings-card .form-control, .settings-card .custom-select { border-radius: 8px; background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-color); transition: background-color var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed); }
+        .settings-card .btn { border-radius: 8px; padding: 0.5rem 1rem; font-weight: 500; }
+        .location-management-buttons, .coordinate-buttons { margin-top: 1rem; }
+        .location-management-buttons .btn, .coordinate-buttons .btn { margin-left: 0.5rem; margin-bottom: 0.5rem; }
+        .location-management-buttons .btn:last-child, .coordinate-buttons .btn:last-child { margin-left: 0; }
+        #theme-toggle { cursor: pointer; font-size: 1.5em; color: var(--text-muted-color); transition: color var(--transition-speed); }
+        #theme-toggle:hover { color: var(--text-color); }
+        body.dark-mode #theme-toggle { color: #e8eaed; }
+        body.dark-mode #theme-toggle:hover { color: #fff; }
+
+        /* Weather Card */
+        .weather-card-main { background-color: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--box-shadow); border: none; margin-top: 0; margin-bottom: 2rem; transition: background-color var(--transition-speed), box-shadow var(--transition-speed); }
+        .card-body { padding: 2rem; }
+        #loading, #error { display: block; }
+        #weather-content { display: none; }
+        .date-time-container { text-align: center; margin-bottom: 2rem; }
+        .time-date { font-size: 1.2em; color: var(--text-muted-color); letter-spacing: 0.5px; }
+        .gregorian-date { font-size: 0.9em; color: var(--text-muted-color); }
+
+        /* Current Weather Section */
+        .current-weather { text-align: center; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border-color); transition: border-color var(--transition-speed); }
+        .current-weather .location { font-size: 1.8em; font-weight: 500; margin-bottom: 1rem; color: var(--primary-color); }
+        .current-weather .main-info { display: flex; align-items: center; justify-content: center; gap: 25px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .current-weather .temperature { font-size: 5em; font-weight: 700; line-height: 1; color: var(--text-color); }
+        .current-weather .weather-icon { font-size: 4.5em; }
+        .current-weather .description { font-size: 1.4em; font-weight: 400; margin-top: 0.5rem; color: var(--text-color); margin-bottom: 1.5rem; }
+        .current-weather .details { font-size: 1em; color: var(--text-muted-color); display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .current-weather .details > div { white-space: nowrap; }
+        .current-weather .details .detail-label { color: var(--text-muted-color); margin-left: 4px; }
+        .current-weather .details span:not(.detail-label) { font-weight: 500; color: var(--text-color); display: inline-block; direction: ltr; unicode-bidi: embed; margin-right: 2px; }
+        .value-unit, .temp-value, .uv-value { display: inline-block; margin-right: 1px; white-space: nowrap; direction: ltr; unicode-bidi: embed; }
+        .temp-value, .uv-value { font-weight: 500; }
+
+        /* Forecast Sections */
+        .forecast-section h3 { font-size: 1.5em; font-weight: 500; margin-bottom: 1.5rem; color: var(--primary-color); text-align: right; padding-bottom: 0.8rem; border-bottom: 2px solid var(--primary-color); display: inline-block; transition: color var(--transition-speed), border-color var(--transition-speed);}
+        .forecast-section .section-header { text-align: right; margin-bottom: 1.5rem; }
+
+        /* Hourly Forecast */
+        .hourly-forecast .row { margin-right: -7px; margin-left: -7px; }
+        .hourly-forecast .col-hourly { padding-right: 7px; padding-left: 7px; margin-bottom: 14px; }
+        .hourly-card { background-color: #e9ecef; padding: 14px 12px; border-radius: calc(var(--border-radius) - 5px); text-align: center; border: 1px solid var(--border-color); transition: all var(--transition-speed) ease-in-out; height: 100%; display: flex; flex-direction: column; justify-content: space-between; min-height: 195px; }
+        .hourly-card:hover:not(.is-current):not(.is-past) { transform: translateY(-3px); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); }
+        .hourly-card .time { font-size: 1.1em; font-weight: 500; color: var(--text-muted-color); margin-bottom: 7px; }
+        .hourly-card .icon { font-size: 2.1em; margin: 6px 0; line-height: 1; }
+        .hourly-card .temp { font-size: 1.4em; font-weight: 700; color: var(--text-color); margin: 5px 0; white-space: nowrap; direction: ltr; unicode-bidi: embed; }
+        .hourly-card .hourly-desc { font-size: 1em; color: var(--text-muted-color); margin-top: 7px; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-height: calc(1.4em * 2); margin-bottom: 12px; }
+        .hourly-card .extra-info { font-size: 0.9em; line-height: 1.5; color: var(--text-muted-color); margin-top: auto; padding-top: 8px; }
+        .hourly-card .extra-info > div { margin-bottom: 4px; white-space: nowrap; display: flex; justify-content: center; align-items: baseline; gap: 4px; }
+        .hourly-card .extra-info .fas { font-size: 1em; color: var(--icon-color-muted); width: 1em; text-align: center; flex-shrink: 0; }
+        .hourly-card .extra-info .feels-label { font-size: 0.9em; color: var(--text-muted-color); margin-left: 2px; }
+        .hourly-card .extra-info span { font-weight: 500; display: inline-block; direction: ltr; unicode-bidi: embed; white-space: nowrap; }
+        .hourly-card.is-past { opacity: var(--past-opacity); background-color: #f1f3f5; border-color: var(--border-color); }
+        .hourly-card.is-past:hover { transform: none; box-shadow: none; }
+        .hourly-card.is-current { background-color: var(--primary-color); color: white; border-color: var(--primary-color); transform: scale(1.03); box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3); opacity: 1; z-index: 1; position: relative; }
+        .hourly-card.is-current .time, .hourly-card.is-current .temp, .hourly-card.is-current .hourly-desc, .hourly-card.is-current .extra-info, .hourly-card.is-current .extra-info .feels-label, .hourly-card.is-current .extra-info span, .hourly-card.is-current .extra-info .fas { color: white !important; }
+        .hourly-card.is-current .time { font-weight: 700; }
+        .hourly-card.is-current:hover { transform: scale(1.03) translateY(-2px); box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4); }
+
+        /* Daily Forecast */
+        .daily-forecast .row { margin-right: -15px; margin-left: -15px; }
+        .daily-forecast .col-daily { padding-right: 15px; padding-left: 15px; margin-bottom: 25px; }
+        .daily-card { background-color: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--box-shadow); border: none; height: 100%; text-align: center; transition: transform var(--transition-speed) ease-in-out, box-shadow var(--transition-speed) ease-in-out, background-color var(--transition-speed); }
+        .daily-card:hover { transform: translateY(-5px); box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12); }
+        .daily-card .card-body { padding: 1.3rem 1.1rem; }
+        .daily-card .date-shamsi { font-weight: 500; font-size: 1.1em; margin-bottom: 0.2rem; color: var(--primary-color); }
+        .daily-card .date-gregorian { font-size: 0.85em; color: var(--text-muted-color); margin-bottom: 0.9rem; }
+        .daily-card .icon { font-size: 3.2em; margin-bottom: 0.9rem; display: block; }
+        .daily-card .description { font-size: 1.05em; margin-bottom: 0.9rem; }
+        .daily-card .temps { font-size: 1.15em; font-weight: 500; margin-bottom: 0.9rem; white-space: nowrap; }
+        .daily-card .temps .min-temp, .daily-card .temps .max-temp { display: inline-block; direction: ltr; unicode-bidi: embed; }
+        .daily-card .temps .min-temp { color: var(--text-muted-color); margin-right: 5px; }
+        .daily-card .temps .max-temp { margin-left: 5px; }
+        .daily-card .extra-info { font-size: 0.9em; line-height: 1.6; color: var(--text-muted-color); margin-top: 0.6rem; border-top: 1px dashed var(--border-color); padding-top: 0.6rem; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 12px; }
+        .daily-card .extra-info > div { white-space: nowrap; display: flex; align-items: baseline; gap: 4px; }
+        .daily-card .extra-info .fas { font-size: 0.95em; color: var(--icon-color-muted); width: 1em; text-align: center; flex-shrink: 0; }
+        .daily-card .extra-info .info-label { font-size: 0.9em; color: var(--text-muted-color); }
+        .daily-card .extra-info span { font-weight: 500; display: inline-block; direction: ltr; unicode-bidi: embed; }
+
+        /* Footer Styling */
+        footer { flex-shrink: 0; text-align: center; padding: 1rem 0; margin-top: 2rem; font-size: 0.9em; color: var(--text-muted-color); border-top: 1px solid var(--border-color); transition: color var(--transition-speed), border-color var(--transition-speed); }
+        footer .source-info { font-size: 0.9em; color: var(--text-muted-color); margin-bottom: 0.5rem; }
+        footer .source-info a { color: var(--text-muted-color); font-weight: normal; text-decoration: underline; }
+        footer .source-info a:hover { color: var(--primary-color); }
+        footer .designer-info { font-size: 0.8em; color: var(--body-bg); transition: color var(--transition-speed); }
+        footer .designer-info a { color: var(--body-bg); text-decoration: none; transition: color var(--transition-speed); }
+        body.dark-mode footer .designer-info a { color: var(--body-bg); }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+             .container { max-width: 720px; }
+             .card-body { padding: 1.5rem; }
+             .current-weather .temperature { font-size: 4em; }
+             .current-weather .weather-icon { font-size: 3.5em; }
+             .current-weather .details { gap: 15px; font-size: 0.95em;}
+             .daily-card .date-shamsi { font-size: 1.05em; }
+             .daily-card .date-gregorian { font-size: 0.8em; }
+             .daily-card .icon { font-size: 3em; }
+             .daily-card .description { font-size: 1em; }
+             .daily-card .temps { font-size: 1.1em; }
+             .daily-card .extra-info { font-size: 0.85em; gap: 10px;}
+             .daily-card .extra-info .fas { font-size: 0.9em; }
+             .hourly-forecast .col-hourly { width: 25%; padding-right: 6px; padding-left: 6px; margin-bottom: 12px;}
+             .hourly-card { min-height: 190px; padding: 12px 10px; }
+             .hourly-card .time { font-size: 1em; }
+             .hourly-card .icon { font-size: 2em; }
+             .hourly-card .temp { font-size: 1.3em; }
+             .hourly-card .hourly-desc { font-size: 0.9em; min-height: calc(1.4em * 2); margin-bottom: 10px;}
+             .hourly-card .extra-info { font-size: 0.85em; padding-top: 7px;}
+             .hourly-card .extra-info .fas { font-size: 0.95em; }
+             .hourly-card .extra-info .feels-label { font-size: 0.9em;}
+             .settings-card .btn-link { font-size: 1em; }
+             .location-management-buttons .btn, .coordinate-buttons .btn { font-size: 0.9em; padding: 0.4rem 0.8rem; }
+        }
+         @media (max-width: 576px) {
+              .time-date { font-size: 1.1em; }
+              .gregorian-date { font-size: 0.8em; }
+              .current-weather .location { font-size: 1.5em; }
+              .current-weather .temperature { font-size: 3.5em; }
+              .current-weather .weather-icon { font-size: 3em; }
+              .current-weather .description { font-size: 1.2em; }
+              .current-weather .details { gap: 10px; font-size: 0.9em; }
+              .forecast-section h3 { font-size: 1.3em; }
+              .daily-card .card-body { padding: 1.1rem 0.9rem; }
+              .daily-card .date-shamsi { font-size: 1em; }
+              .daily-card .icon { font-size: 2.8em; margin-bottom: 0.7rem; }
+              .daily-card .description { font-size: 1em; margin-bottom: 0.7rem; }
+              .daily-card .temps { font-size: 1.05em; margin-bottom: 0.7rem; }
+              .daily-card .extra-info { font-size: 0.8em; margin-top: 0.5rem; padding-top: 0.5rem; gap: 8px;}
+              .daily-card .extra-info .fas { font-size: 0.85em; }
+              .hourly-forecast .col-hourly { width: 33.33%; padding-right: 5px; padding-left: 5px; margin-bottom: 10px;}
+              .hourly-card { min-height: 185px; padding: 10px 8px; }
+              .hourly-card .time { font-size: 0.95em;}
+              .hourly-card .icon { font-size: 1.9em; }
+              .hourly-card .temp { font-size: 1.2em; }
+              .hourly-card .hourly-desc { font-size: 0.85em; min-height: calc(1.4em * 2); margin-bottom: 8px;}
+              .hourly-card .extra-info { font-size: 0.8em; padding-top: 6px;}
+              .hourly-card .extra-info .fas { font-size: 0.9em; }
+              .hourly-card .extra-info .feels-label { font-size: 0.9em;}
+              .settings-card .btn-link { font-size: 1em; }
+              .location-management-buttons .btn, .coordinate-buttons .btn { font-size: 0.85em; padding: 0.35rem 0.7rem; width: auto; /* Allow buttons to wrap */ display: inline-block;}
+              .coordinate-buttons { margin-top: 0.5rem; } /* Reduce space */
+              .form-row > .col-md-6 { margin-bottom: 0.75rem; } /* Add spacing between rows on mobile */
+         }
+    </style>
+
+    <!-- Default Location (Easily Modifiable by User) -->
+    <script>
+        window.INITIAL_DEFAULT_LOCATION = {
+            id: 'default-home',
+            name: 'تهران',
+            latitude: 35.7000151078977,   // عرض جغرافیایی پیش‌فرض
+            longitude:  51.33753626310464 // طول جغرافیایی پیش‌فرض
+        };
+    </script>
+
+</head>
+<body>
+    <!-- Wrap main content to push footer down -->
+    <div class="main-content">
+        <div class="container">
+
+            <!-- Settings Card -->
+            <div class="card settings-card">
+                <div class="card-header" id="settingsHeader">
+                    <a href="#" class="btn btn-link" data-toggle="collapse" data-target="#settingsCollapse" aria-expanded="false" aria-controls="settingsCollapse">
+                        تنظیمات و مدیریت مکان‌ها<i class="fas fa-cog mr-2"></i>
+                    </a>
+                     <span id="theme-toggle" title="تغییر حالت نمایش">
+                        <i class="fas fa-moon"></i>
+                     </span>
+                </div>
+                <div id="settingsCollapse" class="collapse">
+                    <div class="card-body">
+                         <div class="alert alert-secondary small text-center" role="alert">
+                             یک مکان را از لیست انتخاب کنید یا مشخصات مکان جدید را وارد کرده و دکمه «ذخیره/افزودن» را بزنید.
+                         </div>
+
+                         <div class="form-group">
+                             <label for="locationSelect">انتخاب مکان ذخیره شده</label>
+                             <select class="custom-select" id="locationSelect">
+                                 <option value="">-- انتخاب کنید یا جدید اضافه کنید --</option>
+                                 <!-- Options added by JS -->
+                             </select>
+                         </div>
+
+                         <hr>
+
+                         <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="locationNameInput">نام مکان (برای نمایش)</label>
+                                <input type="text" class="form-control" id="locationNameInput" placeholder="مثلا: خانه، محل کار تهران">
+                            </div>
+                         </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="latitudeInput">عرض جغرافیایی (Latitude)</label>
+                                <input type="number" step="any" class="form-control" id="latitudeInput" placeholder="مثال: 35.8467">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="longitudeInput">طول جغرافیایی (Longitude)</label>
+                                <input type="number" step="any" class="form-control" id="longitudeInput" placeholder="مثال: 50.9745">
+                            </div>
+                        </div>
+
+                         <div class="coordinate-buttons text-right mb-3">
+                             <button type="button" id="pasteCoordsBtn" class="btn btn-secondary btn-sm">
+                                 <i class="fas fa-paste mr-1"></i> جایگذاری مختصات از کلیپ‌بورد
+                             </button>
+                              <button type="button" id="getCurrentLocationBtn" class="btn btn-info btn-sm">
+                                 <i class="fas fa-location-arrow mr-1"></i> دریافت مختصات فعلی دستگاه
+                             </button>
+                         </div>
+
+                         <div class="location-management-buttons text-right">
+                              <button type="button" id="saveLocationBtn" class="btn btn-primary">
+                                 <i class="fas fa-save mr-1"></i> ذخیره / افزودن مکان
+                              </button>
+                             <button type="button" id="deleteLocationBtn" class="btn btn-danger btn-sm">
+                                 <i class="fas fa-trash-alt mr-1"></i> حذف مکان انتخابی
+                             </button>
+                         </div>
+
+                        <div id="settings-feedback" class="mt-3 small text-right"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading and Error Messages -->
+            <div id="loading" class="alert alert-info mt-3" role="alert">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                 در حال بارگذاری اطلاعات آب و هوا...
+            </div>
+            <div id="error" class="alert alert-danger mt-3" role="alert">
+                 خطا در دریافت اطلاعات. لطفاً مکان معتبری را انتخاب کنید یا تنظیمات را بررسی کنید.
+            </div>
+
+            <!-- Main Weather Content -->
+            <div id="weather-content">
+                 <div class="weather-card-main">
+                    <div class="card-body">
+                        <div class="date-time-container">
+                             <div id="time-date" class="time-date">--</div>
+                             <div id="gregorian-date" class="gregorian-date">--</div>
+                        </div>
+                        <!-- Current Weather -->
+                        <div class="current-weather">
+                            <h2 id="location-name" class="location mb-3">--</h2>
+                            <div class="main-info">
+                                <div id="current-temp" class="temperature value-unit">--°C</div>
+                                <div id="current-icon" class="weather-icon">--</div>
+                            </div>
+                            <div id="current-desc" class="description mb-4">--</div>
+                            <div class="details">
+                                <div><span class="detail-label">دمای محسوس:</span><span id="current-feels-like">--°C</span></div>
+                                <div><span class="detail-label">رطوبت:</span><span id="current-humidity">--%</span></div>
+                                <div><span class="detail-label">باد:</span><span id="current-wind">-- km/h</span></div>
+                                <div><span class="detail-label">فشار:</span><span id="current-pressure">-- hPa</span></div>
+                                <div><span class="detail-label">شاخص UV:</span><span id="current-uv-index">--</span></div>
+                            </div>
+                        </div>
+                        <!-- Hourly Forecast -->
+                         <div class="forecast-section hourly-forecast mb-4">
+                             <div class="section-header"><h3>پیش‌بینی ساعتی</h3></div>
+                             <div id="hourly-cards" class="row">
+                                 <div class="col-12 text-center text-muted">
+                                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                      در حال بارگذاری پیش‌بینی ساعتی...
+                                 </div>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+                <!-- Daily Forecast -->
+                 <div class="forecast-section daily-forecast mb-4">
+                     <div class="section-header"><h3>پیش‌بینی روزانه</h3></div>
+                     <div id="daily-items" class="row">
+                          <div class="col-12 text-center text-muted">
+                               <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                               در حال بارگذاری پیش‌بینی روزانه...
+                          </div>
+                     </div>
+                 </div>
+            </div>
+        </div> <!-- End .container -->
+    </div> <!-- End .main-content -->
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="source-info">
+            اطلاعات آب و هوا از <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo.com</a>
+        </div>
+        <div class="designer-info">
+            طراحی : Navid Basseri (<a href="mailto:basseri@gmail.com">basseri@gmail.com</a>)
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+
+    <script>
+        // --- Configuration & Settings ---
+        const SETTINGS_KEY = 'weatherAppMultiLocationSettings';
+        // DEFAULT_SETTINGS is now primarily a fallback structure concept, initialization logic is handled in loadSettings
+        const WEATHER_UPDATE_INTERVAL = 30 * 60 * 1000;
+        const HOURLY_TOTAL_CARDS = 12;
+        let currentSettings = {}; // Will be populated by loadSettings
+
+        // --- DOM Elements ---
+        const locationNameElement = document.getElementById('location-name');
+        const timeDateElement = document.getElementById('time-date');
+        const gregorianDateElement = document.getElementById('gregorian-date');
+        const currentTempElement = document.getElementById('current-temp');
+        const currentFeelsLikeElement = document.getElementById('current-feels-like');
+        const currentIconElement = document.getElementById('current-icon');
+        const currentDescElement = document.getElementById('current-desc');
+        const currentWindElement = document.getElementById('current-wind');
+        const currentHumidityElement = document.getElementById('current-humidity');
+        const currentPressureElement = document.getElementById('current-pressure');
+        const currentUvIndexElement = document.getElementById('current-uv-index');
+        const hourlyCardsContainer = document.getElementById('hourly-cards');
+        const dailyItemsContainer = document.getElementById('daily-items');
+        const loadingElement = document.getElementById('loading');
+        const errorElement = document.getElementById('error');
+        const weatherContentElement = document.getElementById('weather-content');
+
+        // Settings Elements
+        const locationSelect = document.getElementById('locationSelect');
+        const locationNameInput = document.getElementById('locationNameInput');
+        const latitudeInput = document.getElementById('latitudeInput');
+        const longitudeInput = document.getElementById('longitudeInput');
+        const saveLocationBtn = document.getElementById('saveLocationBtn');
+        const deleteLocationBtn = document.getElementById('deleteLocationBtn');
+        const settingsFeedback = document.getElementById('settings-feedback');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleIcon = themeToggleBtn.querySelector('i');
+        const pasteCoordsBtn = document.getElementById('pasteCoordsBtn');
+        const getCurrentLocationBtn = document.getElementById('getCurrentLocationBtn');
+
+        // --- Local Storage & Theme Functions ---
+        function saveSettings() { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(currentSettings)); console.log('Settings saved:', currentSettings); } catch (e) { console.error("Error saving settings:", e); displaySettingsFeedback("خطا در ذخیره تنظیمات.", "danger"); } }
+
+        function loadSettings() {
+            let saved = null;
+            try { saved = localStorage.getItem(SETTINGS_KEY); } catch (e) { console.error("Error reading settings from localStorage:", e); }
+
+            let parsed = null;
+            if (saved) {
+                try {
+                    parsed = JSON.parse(saved);
+                    // Basic validation
+                    if (parsed && Array.isArray(parsed.locations) && typeof parsed.selectedLocationId === 'string') {
+                       // Check if the saved locations list is empty, which shouldn't normally happen but could
+                       if (parsed.locations.length === 0) {
+                           console.warn("Saved locations array is empty. Re-initializing with default.");
+                           parsed = null; // Treat as first run
+                       } else {
+                           currentSettings = parsed;
+                           // Ensure coords are numbers
+                           currentSettings.locations = currentSettings.locations.map(loc => ({
+                               ...loc,
+                               latitude: parseFloat(loc.latitude) || 0,
+                               longitude: parseFloat(loc.longitude) || 0
+                           }));
+                           // Ensure selected ID exists
+                           if (!currentSettings.locations.some(loc => loc.id === currentSettings.selectedLocationId)) {
+                                console.warn(`Saved selectedLocationId '${currentSettings.selectedLocationId}' not found in locations. Selecting first location.`);
+                                currentSettings.selectedLocationId = currentSettings.locations[0].id;
+                           }
+                           console.log('Settings loaded from localStorage:', currentSettings);
+                           return; // Success loading from storage
+                       }
+                    } else {
+                       console.warn("Loaded settings structure invalid, initializing defaults.");
+                       parsed = null; // Treat as first run due to invalid structure
+                    }
+                } catch (e) {
+                    console.error("Error parsing saved settings:", e, "Initializing defaults.");
+                    parsed = null; // Treat as first run due to parse error
+                }
+            }
+
+            // --- Default Initialization (First Run or Error Case) ---
+            console.log('Initializing default settings.');
+            // Use the INITIAL_DEFAULT_LOCATION directly if available
+            const initialLocation = window.INITIAL_DEFAULT_LOCATION || { id: 'default-fallback', name: 'تهران (پیش‌فرض)', latitude: 35.6892, longitude: 51.3890 };
+            // Ensure coordinates are numbers right away for the initial location
+            initialLocation.latitude = parseFloat(initialLocation.latitude) || 0;
+            initialLocation.longitude = parseFloat(initialLocation.longitude) || 0;
+
+            currentSettings = {
+                 locations: [initialLocation], // Start with only the initial location
+                 selectedLocationId: initialLocation.id, // Select it
+                 theme: 'light' // Default theme
+            };
+
+             // Log the settings that were actually set
+             console.log('Default settings initialized:', JSON.parse(JSON.stringify(currentSettings)));
+             // Optionally, save these defaults immediately to storage?
+             // saveSettings(); // Uncomment if you want defaults to persist immediately after first load
+        }
+
+
+        function applyTheme(theme) { if (theme === 'dark') { document.body.classList.add('dark-mode'); themeToggleIcon.className = 'fas fa-sun'; } else { document.body.classList.remove('dark-mode'); themeToggleIcon.className = 'fas fa-moon'; } currentSettings.theme = theme; }
+        function toggleTheme() { const newTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark'; applyTheme(newTheme); saveSettings(); console.log("Theme toggled to:", newTheme); }
+
+        function displaySettingsFeedback(message, type = "success") { settingsFeedback.textContent = message || ''; settingsFeedback.className = `mt-3 small text-${type} text-right`; setTimeout(() => { if (settingsFeedback.textContent === message) { settingsFeedback.textContent = ''; } }, 5000); }
+
+        // --- Location Management Functions ---
+        function populateLocationSelect() {
+            locationSelect.innerHTML = '<option value="">-- انتخاب کنید یا جدید اضافه کنید --</option>'; // Reset
+            if (!currentSettings || !currentSettings.locations) return;
+
+            currentSettings.locations.forEach(loc => {
+                const option = document.createElement('option');
+                option.value = loc.id;
+                option.textContent = loc.name;
+                if (loc.id === currentSettings.selectedLocationId) {
+                    option.selected = true;
+                }
+                locationSelect.appendChild(option);
+            });
+        }
+
+        function updateSettingsInputsForSelectedLocation() {
+            const selectedId = currentSettings.selectedLocationId;
+            const selectedLocation = currentSettings.locations.find(loc => loc.id === selectedId);
+
+            if (selectedLocation) {
+                locationNameInput.value = selectedLocation.name;
+                latitudeInput.value = selectedLocation.latitude;
+                longitudeInput.value = selectedLocation.longitude;
+                deleteLocationBtn.disabled = false; // Enable delete for selected
+            } else {
+                // No location selected or found (e.g., after delete or initial state)
+                locationNameInput.value = '';
+                latitudeInput.value = '';
+                longitudeInput.value = '';
+                 // Clear dropdown selection visually if needed
+                 locationSelect.value = "";
+                 deleteLocationBtn.disabled = true; // Disable delete if nothing selected
+                 // Keep inputs enabled for adding a new location
+            }
+        }
+
+        function handleLocationSelectionChange() {
+             const selectedId = locationSelect.value;
+             if (selectedId && selectedId !== currentSettings.selectedLocationId) {
+                 currentSettings.selectedLocationId = selectedId;
+                 updateSettingsInputsForSelectedLocation();
+                 saveSettings();
+                 fetchAndUpdateWeather(); // Update weather for new selection
+                 displaySettingsFeedback("مکان انتخاب شد. در حال بارگذاری...", "info");
+             } else if (!selectedId) {
+                 // User selected the "-- choose --" option, potentially to add new
+                 currentSettings.selectedLocationId = null; // Mark as no location selected
+                 updateSettingsInputsForSelectedLocation(); // Clear inputs
+                 displaySettingsFeedback("مشخصات مکان جدید را وارد و ذخیره کنید.", "info");
+                 // Optionally clear weather display here? Or keep the last one? Keep last for now.
+             }
+        }
+
+        function handleSaveLocation() {
+            const name = locationNameInput.value.trim();
+            const latStr = latitudeInput.value;
+            const lonStr = longitudeInput.value;
+            const lat = parseFloat(latStr);
+            const lon = parseFloat(lonStr);
+
+            if (!name) { displaySettingsFeedback("لطفاً نام مکان را وارد کنید.", "warning"); return; }
+            if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) { displaySettingsFeedback("مقادیر عرض و طول جغرافیایی نامعتبر هستند.", "danger"); return; }
+
+            const selectedId = locationSelect.value; // ID from dropdown
+
+            if (selectedId) {
+                // Update existing location
+                const index = currentSettings.locations.findIndex(loc => loc.id === selectedId);
+                if (index !== -1) {
+                    currentSettings.locations[index] = { ...currentSettings.locations[index], name, latitude: lat, longitude: lon };
+                    currentSettings.selectedLocationId = selectedId; // Ensure it remains selected
+                    saveSettings();
+                    populateLocationSelect(); // Refresh dropdown text if name changed
+                    updateSettingsInputsForSelectedLocation(); // Re-sync inputs
+                    fetchAndUpdateWeather(); // Update weather
+                    displaySettingsFeedback(`مکان "${name}" به‌روزرسانی شد.`, "success");
+                    $('#settingsCollapse').collapse('hide');
+                } else {
+                    displaySettingsFeedback("خطا: مکان انتخاب شده برای به‌روزرسانی یافت نشد.", "danger");
+                }
+            } else {
+                // Add new location
+                const newId = `loc-${Date.now()}`;
+                const newLocation = { id: newId, name, latitude: lat, longitude: lon };
+                currentSettings.locations.push(newLocation);
+                currentSettings.selectedLocationId = newId; // Select the newly added location
+                saveSettings();
+                populateLocationSelect(); // Add to dropdown and select it
+                updateSettingsInputsForSelectedLocation(); // Show details in inputs
+                fetchAndUpdateWeather(); // Load weather for the new location
+                displaySettingsFeedback(`مکان جدید "${name}" اضافه و انتخاب شد.`, "success");
+                $('#settingsCollapse').collapse('hide');
+            }
+        }
+
+        function handleDeleteLocation() {
+            const selectedId = locationSelect.value;
+            if (!selectedId) { displaySettingsFeedback("لطفاً ابتدا مکانی را برای حذف از لیست انتخاب کنید.", "warning"); return; }
+
+            const locationToDelete = currentSettings.locations.find(loc => loc.id === selectedId);
+            if (!locationToDelete) { displaySettingsFeedback("خطا: مکان انتخاب شده برای حذف یافت نشد.", "danger"); return; }
+
+            if (confirm(`آیا از حذف مکان "${locationToDelete.name}" مطمئن هستید؟`)) {
+                currentSettings.locations = currentSettings.locations.filter(loc => loc.id !== selectedId);
+
+                // If the deleted was the selected one, select another or none
+                if (currentSettings.selectedLocationId === selectedId) {
+                   currentSettings.selectedLocationId = currentSettings.locations.length > 0 ? currentSettings.locations[0].id : null;
+                }
+
+                saveSettings();
+                populateLocationSelect(); // Refresh dropdown
+                updateSettingsInputsForSelectedLocation(); // Update inputs based on new selection (or clear them)
+
+                if (currentSettings.selectedLocationId) {
+                     fetchAndUpdateWeather(); // Load weather for the newly selected location
+                     displaySettingsFeedback(`مکان "${locationToDelete.name}" حذف شد. مکان "${currentSettings.locations.find(l=>l.id===currentSettings.selectedLocationId).name}" انتخاب شد.`, "success");
+                 } else {
+                     // No locations left, clear weather display maybe?
+                     locationNameElement.textContent = 'مکانی انتخاب نشده';
+                     weatherContentElement.style.display = 'none';
+                     errorElement.textContent = 'لطفاً یک مکان اضافه یا انتخاب کنید.';
+                     errorElement.style.display = 'block';
+                     loadingElement.style.display = 'none';
+                     displaySettingsFeedback(`مکان "${locationToDelete.name}" حذف شد. لیست خالی است.`, "success");
+                 }
+            }
+        }
+
+        // --- Weather Code Mapping ---
+        function getWeatherInfo(code, isDay = 1) {
+             const isNight = !isDay;
+             const baseDescriptions = { 0: 'صاف', 1: 'عمدتاً صاف', 2: 'کمی ابری', 3: 'ابری', 45: 'مه', 48: 'مه غلیظ یخ‌زده', 51: 'نم نم باران سبک', 53: 'نم نم باران متوسط', 55: 'نم نم باران شدید', 56: 'نم نم باران یخ‌زده سبک', 57: 'نم نم باران یخ‌زده شدید', 61: 'باران سبک', 63: 'باران متوسط', 65: 'باران شدید', 66: 'باران یخ‌زده سبک', 67: 'باران یخ‌زده شدید', 71: 'برف سبک', 73: 'برف متوسط', 75: 'برف شدید', 77: 'دانه‌های برف', 80: 'رگبار باران سبک', 81: 'رگبار باران متوسط', 82: 'رگبار باران شدید', 85: 'رگبار برف سبک', 86: 'رگبار برف شدید', 95: 'رعد و برق', 96: 'رعد و برق با تگرگ سبک', 99: 'رعد و برق با تگرگ شدید', };
+             const iconMap = { 0: { day: '☀️', night: '🌙' }, 1: { day: '🌤️', night: '🌙' }, 2: { day: '🌥️', night: '☁️🌙' }, 3: { day: '☁️', night: '☁️' }, 45: { day: '🌫️', night: '🌫️' }, 48: { day: '🥶🌫️', night: '🥶🌫️' }, 51: { day: '💧', night: '💧' }, 53: { day: '💧', night: '💧' }, 55: { day: '💧', night: '💧' }, 56: { day: '🥶💧', night: '🥶💧' }, 57: { day: '🥶💧', night: '🥶💧' }, 61: { day: '🌧️', night: '🌧️' }, 63: { day: '🌧️', night: '🌧️' }, 65: { day: ' torrential rain️', night: ' torrential rain️' }, 66: { day: '🥶🌧️', night: '🥶🌧️' }, 67: { day: '🥶🌧️', night: '🥶🌧️' }, 71: { day: '❄️', night: '❄️' }, 73: { day: '❄️', night: '❄️' }, 75: { day: ' blizzard️', night: ' blizzard️' }, 77: { day: '❄️', night: '❄️' }, 80: { day: '🌦️', night: '🌧️' }, 81: { day: '🌦️', night: '🌧️' }, 82: { day: '⛈️', night: '⛈️' }, 85: { day: '🌨️', night: '🌨️' }, 86: { day: '🌨️', night: '🌨️' }, 95: { day: '⚡', night: '⚡' }, 96: { day: '⛈️🧊', night: '⛈️🧊' }, 99: { day: '⛈️🧊', night: '⛈️🧊' }, };
+             const description = baseDescriptions[code] || 'نامشخص';
+             const icons = iconMap[code] || { day: '❓', night: '❓' };
+             const icon = isNight ? icons.night : icons.day;
+             const finalDescription = description;
+             return { description: finalDescription, icon: icon };
+        }
+
+        // --- Utilities (Formatting Functions) ---
+        function toPersianNumeral(enNum) { if (enNum === null || enNum === undefined || isNaN(enNum)) return '--'; const numStr = String(enNum); const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']; return numStr.replace(/[0-9.-]/g, d => (d === '.' ? '.' : (d === '-' ? '-' : persianDigits[parseInt(d)]))); }
+        function formatTempString(temp, unit = '°C') { return `${toPersianNumeral(Math.round(temp))}${unit}`; }
+        function formatPercentageString(value) { return `${toPersianNumeral(Math.round(value))}%`; }
+        function formatUVIndexString(value) { return toPersianNumeral(Math.round(value)); }
+        function formatSpeedString(value, unit = 'km/h') { return `${toPersianNumeral(Math.round(value))} ${unit}`; }
+        function formatPressureString(value, unit = 'hPa') { return `${toPersianNumeral(Math.round(value))} ${unit}`; }
+        function getShamsiDateString(date) { const weekday = date.toLocaleDateString('fa-IR', { weekday: 'long', numberingSystem: 'arab'}); const day = date.toLocaleDateString('fa-IR', { day: 'numeric', numberingSystem: 'arab'}); const month = date.toLocaleDateString('fa-IR', { month: 'long', numberingSystem: 'arab'}); return `${weekday}، ${day} ${month}`; }
+        function getGregorianDateString(date) { return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric'}); }
+
+        // --- Time Update ---
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, numberingSystem: 'arab' });
+            const weekday = now.toLocaleDateString('fa-IR', { weekday: 'long', numberingSystem: 'arab'});
+            const day = now.toLocaleDateString('fa-IR', { day: 'numeric', numberingSystem: 'arab'});
+            const month = now.toLocaleDateString('fa-IR', { month: 'long', numberingSystem: 'arab'});
+            const year = now.toLocaleDateString('fa-IR', { year: 'numeric', numberingSystem: 'arab'});
+            const dateStr = `${weekday}، ${day} ${month} ${year}`;
+            const gregDateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            timeDateElement.textContent = `${dateStr} | ${timeStr}`;
+            gregorianDateElement.textContent = gregDateStr;
+        }
+
+        // --- Weather Update ---
+        async function fetchAndUpdateWeather() {
+            const selectedId = currentSettings.selectedLocationId;
+            const selectedLocation = currentSettings.locations.find(loc => loc.id === selectedId);
+
+            if (!selectedLocation) {
+                errorElement.textContent = 'هیچ مکانی انتخاب نشده است. لطفاً یک مکان را از تنظیمات انتخاب یا اضافه کنید.';
+                errorElement.style.display = 'block';
+                loadingElement.style.display = 'none';
+                weatherContentElement.style.display = 'none';
+                locationNameElement.textContent = 'مکان نامشخص';
+                console.warn("fetchAndUpdateWeather called but no location is selected.");
+                return;
+            }
+
+            loadingElement.style.display = 'block';
+            errorElement.style.display = 'none';
+            weatherContentElement.style.display = 'none';
+            hourlyCardsContainer.innerHTML = '<div class="col-12 text-center text-muted"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> در حال بارگذاری پیش‌بینی ساعتی...</div>';
+            dailyItemsContainer.innerHTML = '<div class="col-12 text-center text-muted"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> در حال بارگذاری پیش‌بینی روزانه...</div>';
+            displaySettingsFeedback(''); // Clear settings feedback
+
+            console.log(`Fetching weather data for ${selectedLocation.name} (Lat: ${selectedLocation.latitude}, Lon: ${selectedLocation.longitude})...`);
+
+            const WEATHER_API_URL = `https://api.open-meteo.com/v1/forecast?latitude=${selectedLocation.latitude}&longitude=${selectedLocation.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,surface_pressure,is_day,uv_index&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_probability_max&timezone=auto&forecast_days=10`;
+
+            try {
+                const response = await fetch(WEATHER_API_URL);
+                console.log("API Response Status:", response.status);
+                if (!response.ok) {
+                    let errorMsg = `خطای شبکه: ${response.status}`;
+                    try { const errorData = await response.json(); if(errorData && errorData.reason) errorMsg += ` - ${errorData.reason}`; } catch(e) {/* Ignore */}
+                    throw new Error(errorMsg);
+                 }
+                const data = await response.json();
+                console.log("API Data Received:", data);
+
+                 // --- Validation ---
+                 const requiredArrays = {
+                    hourly: ['time', 'temperature_2m', 'apparent_temperature', 'precipitation_probability', 'weather_code', 'is_day'],
+                    daily: ['time', 'weather_code', 'temperature_2m_max', 'temperature_2m_min', 'uv_index_max', 'precipitation_probability_max']
+                 };
+                 if (!data || !data.current || !data.hourly || !data.daily || data.current.is_day == null || data.current.uv_index == null ) {
+                     throw new Error("ساختار داده‌های پایه API نامعتبر است.");
+                 }
+                 for (const key in requiredArrays) {
+                     const times = data[key]?.time;
+                     if (!times || !Array.isArray(times) || times.length === 0) {
+                         throw new Error(`آرایه زمان (${key}) در API نامعتبر یا خالی است.`);
+                     }
+                     for (const param of requiredArrays[key]) {
+                         if (param === 'time') continue;
+                         const arr = data[key]?.[param];
+                          if (!arr || !Array.isArray(arr) || arr.length !== times.length) {
+                              throw new Error(`آرایه پارامتر ${param} (${key}) در API نامعتبر یا طول نامتناسب دارد.`);
+                          }
+                     }
+                 }
+
+                const now = new Date();
+                const nowTimestamp = now.getTime();
+                const currentActualHour = now.getHours();
+
+                // -- Update Location Name --
+                locationNameElement.textContent = selectedLocation.name;
+
+                // -- Update Current Weather --
+                const current = data.current;
+                const weatherInfo = getWeatherInfo(current.weather_code, current.is_day);
+                currentTempElement.textContent = formatTempString(current.temperature_2m);
+                currentIconElement.textContent = weatherInfo.icon;
+                currentDescElement.textContent = weatherInfo.description;
+                currentWindElement.textContent = formatSpeedString(current.wind_speed_10m);
+                currentHumidityElement.textContent = formatPercentageString(current.relative_humidity_2m);
+                currentFeelsLikeElement.textContent = formatTempString(current.apparent_temperature);
+                currentPressureElement.textContent = formatPressureString(current.surface_pressure);
+                currentUvIndexElement.textContent = formatUVIndexString(current.uv_index);
+                console.log("Current weather updated.");
+
+                // --- Generate Hourly Forecast ---
+                hourlyCardsContainer.innerHTML = '';
+                let hourlyRenderedCount = 0;
+                let currentBlockStartHour = Math.floor(currentActualHour / 6) * 6;
+                const blockStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), currentBlockStartHour, 0, 0);
+                const blockStartTimestamp = blockStartDate.getTime();
+                let apiStartIndex = data.hourly.time.findIndex(timeISO => new Date(timeISO).getTime() >= blockStartTimestamp);
+
+                if (apiStartIndex === -1) {
+                    console.warn(`Could not find start index for current block (${currentBlockStartHour}:00). Trying from first available hour.`);
+                    // Fallback: find the index closest to now
+                     apiStartIndex = data.hourly.time.findIndex(timeISO => new Date(timeISO).getTime() >= nowTimestamp);
+                     if (apiStartIndex > 0) apiStartIndex--; // Try to start one hour before if possible
+                     else if (apiStartIndex === -1) apiStartIndex = 0; // Default to 0 if still not found
+                 }
+                 console.log(`Current Hour: ${currentActualHour}, Target Block Start: ${currentBlockStartHour}:00, Actual API Start Index: ${apiStartIndex}`);
+
+                 for (let i = 0; i < HOURLY_TOTAL_CARDS; i++) {
+                     const dataIndex = apiStartIndex + i;
+                     if (dataIndex >= data.hourly.time.length) { console.warn(`Hourly data ended prematurely. Rendered ${hourlyRenderedCount} cards.`); break; }
+
+                     const timeISO = data.hourly.time[dataIndex]; const temp = data.hourly.temperature_2m[dataIndex]; const apparentTemp = data.hourly.apparent_temperature[dataIndex]; const precipProb = data.hourly.precipitation_probability[dataIndex]; const code = data.hourly.weather_code[dataIndex]; const isDay = data.hourly.is_day[dataIndex];
+                     if (timeISO == null || temp == null || apparentTemp == null || precipProb == null || code == null || isDay == null) { console.warn(`Skipping hourly card at dataIndex ${dataIndex} due to null value.`); continue; }
+
+                     const cardDate = new Date(timeISO); const cardTimestamp = cardDate.getTime(); const cardHour = cardDate.getHours(); const displayHourStr = cardDate.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit', hour12: false, numberingSystem: 'arab' }); const hourlyWeatherInfo = getWeatherInfo(code, isDay);
+
+                     const colDiv = document.createElement('div'); colDiv.className = 'col-lg-2 col-md-3 col-sm-4 col-hourly';
+                     const card = document.createElement('div'); card.classList.add('hourly-card');
+
+                     const isCurrentHourCard = cardHour === currentActualHour && cardDate.toDateString() === now.toDateString();
+                     const isPastHourCard = cardTimestamp < nowTimestamp && !isCurrentHourCard;
+
+                     if (isCurrentHourCard) { card.classList.add('is-current'); }
+                     else if (isPastHourCard) { card.classList.add('is-past'); }
+
+                     card.innerHTML = `
+                         <div class="time">${displayHourStr}</div>
+                         <div class="icon">${hourlyWeatherInfo.icon}</div>
+                         <div class="temp">${formatTempString(temp, '°')}</div>
+                         <div class="hourly-desc">${hourlyWeatherInfo.description}</div>
+                         <div class="extra-info">
+                             <div><i class="fas fa-tint"></i> <span class="value-unit">${formatPercentageString(precipProb)}</span></div>
+                             <div><i class="fas fa-thermometer-half"></i> <span class="feels-label">:محسوس</span> <span class="feels-temp">${formatTempString(apparentTemp, '°')}</span></div>
+                         </div>`;
+                     colDiv.appendChild(card); hourlyCardsContainer.appendChild(colDiv); hourlyRenderedCount++;
+                 } // End for loop
+
+                 console.log(`Hourly cards rendered: ${hourlyRenderedCount}`);
+                 if (hourlyRenderedCount === 0 && data.hourly.time.length > 0) { hourlyCardsContainer.innerHTML = '<div class="col-12"><p class="text-warning text-center">اطلاعات ساعتی کافی یا معتبر برای نمایش یافت نشد.</p></div>'; }
+
+                 // -- Generate Daily Forecast --
+                 dailyItemsContainer.innerHTML = '';
+                 let dailyRenderedCount = 0;
+                 const daysToShow = Math.min(data.daily.time.length, 9); // Show up to 9 days
+
+                 for (let index = 0; index < daysToShow; index++) {
+                      const dateStr = data.daily.time[index]; const code = data.daily.weather_code[index]; const maxTemp = data.daily.temperature_2m_max[index]; const minTemp = data.daily.temperature_2m_min[index]; const uvMax = data.daily.uv_index_max[index]; const precipProbMax = data.daily.precipitation_probability_max[index];
+                      if (dateStr == null || code == null || maxTemp == null || minTemp == null || uvMax == null || precipProbMax == null) { console.warn(`Skipping daily card at index ${index} due to null data.`); continue; }
+
+                      const date = new Date(dateStr);
+                      // Optional: Skip 'today' if you strictly want future days
+                      // if (date.toDateString() === now.toDateString()) { continue; }
+
+                      const dailyWeatherInfo = getWeatherInfo(code, 1); const shamsiDateStr = getShamsiDateString(date); const gregorianDateStr = getGregorianDateString(date);
+
+                      const colDiv = document.createElement('div'); colDiv.className = 'col-12 col-sm-6 col-md-4 col-daily';
+                      const card = document.createElement('div'); card.classList.add('card', 'daily-card');
+                      card.innerHTML = `
+                          <div class="card-body">
+                              <div class="date-shamsi">${shamsiDateStr}</div>
+                              <div class="date-gregorian">${gregorianDateStr}</div>
+                              <div class="icon">${dailyWeatherInfo.icon}</div>
+                              <div class="description">${dailyWeatherInfo.description}</div>
+                              <div class="temps">
+                                  <span class="max-temp">${formatTempString(maxTemp)}</span> / <span class="min-temp">${formatTempString(minTemp)}</span>
+                              </div>
+                              <div class="extra-info">
+                                  <div><i class="fas fa-umbrella"></i> <span class="value-unit">${formatPercentageString(precipProbMax)}</span></div>
+                                  <div><i class="fas fa-sun"></i> <span class="info-label">UV:</span> <span class="uv-value">${formatUVIndexString(uvMax)}</span></div>
+                              </div>
+                          </div>`;
+                      colDiv.appendChild(card); dailyItemsContainer.appendChild(colDiv); dailyRenderedCount++;
+                  }
+                 console.log(`Daily cards rendered: ${dailyRenderedCount} (target: ${daysToShow})`);
+                 if (dailyRenderedCount === 0 && data.daily.time.length > 0) { dailyItemsContainer.innerHTML = '<div class="col-12"><p class="text-warning text-center">اطلاعات روزانه کافی یا معتبر برای نمایش یافت نشد.</p></div>'; }
+
+                weatherContentElement.style.display = 'block';
+                loadingElement.style.display = 'none';
+                console.log("Weather content displayed.");
+
+            } catch (err) {
+                console.error("ERROR in fetchAndUpdateWeather:", err);
+                errorElement.textContent = `خطا در دریافت یا پردازش اطلاعات برای "${selectedLocation.name}": ${err.message}. لطفاً اتصال و تنظیمات مختصات را بررسی کنید.`;
+                errorElement.style.display = 'block';
+                loadingElement.style.display = 'none';
+                weatherContentElement.style.display = 'none';
+                hourlyCardsContainer.innerHTML = '<div class="col-12"><p class="text-danger text-center">خطا در بارگذاری پیش‌بینی ساعتی.</p></div>';
+                dailyItemsContainer.innerHTML = '<div class="col-12"><p class="text-danger text-center">خطا در بارگذاری پیش‌بینی روزانه.</p></div>';
+            }
+        }
+
+        // --- Event Listeners ---
+        locationSelect.addEventListener('change', handleLocationSelectionChange);
+        saveLocationBtn.addEventListener('click', handleSaveLocation);
+        deleteLocationBtn.addEventListener('click', handleDeleteLocation);
+        themeToggleBtn.addEventListener('click', toggleTheme);
+
+        pasteCoordsBtn.addEventListener('click', async () => {
+             if (!navigator.clipboard || !navigator.clipboard.readText) { displaySettingsFeedback("مرورگر شما از خواندن کلیپ‌بورد پشتیبانی نمی‌کند یا دسترسی مجاز نیست (HTTPS لازم است).", "danger"); return; }
+             try {
+                 const text = await navigator.clipboard.readText(); if (!text) { displaySettingsFeedback("کلیپ‌بورد خالی است.", "warning"); return; }
+                 // Try to parse various formats, prioritizing comma/space separation like Google Maps
+                 const cleanedText = text.replace(/[°'"N S E W شمالی جنوبی شرقی غربی]/gi, ''); // Remove common coordinate symbols/words
+                 const parts = cleanedText.trim().split(/[\s,،؛\t\n]+/); // Split by common delimiters
+
+                 if (parts.length >= 2) {
+                     const potentialLat = parseFloat(parts[0]);
+                     const potentialLon = parseFloat(parts[1]);
+
+                     if (!isNaN(potentialLat) && !isNaN(potentialLon) && potentialLat >= -90 && potentialLat <= 90 && potentialLon >= -180 && potentialLon <= 180) {
+                         latitudeInput.value = potentialLat.toFixed(6);
+                         longitudeInput.value = potentialLon.toFixed(6);
+                         displaySettingsFeedback("مختصات با موفقیت از کلیپ‌بورد جایگذاری شد. نام مکان را بررسی و ذخیره کنید.", "success");
+                          // Clear dropdown selection to indicate these are new/pasted coords, not necessarily the selected location's
+                          // locationSelect.value = "";
+                          // currentSettings.selectedLocationId = null;
+                          // deleteLocationBtn.disabled = true;
+                          // Or, alternatively, leave the selection and let "Save" update the selected location? Let's stick with updating inputs only for now.
+                     } else {
+                          // Attempt swapping if order might be reversed (Lon, Lat)
+                          const potentialLat2 = parseFloat(parts[1]);
+                          const potentialLon2 = parseFloat(parts[0]);
+                           if (!isNaN(potentialLat2) && !isNaN(potentialLon2) && potentialLat2 >= -90 && potentialLat2 <= 90 && potentialLon2 >= -180 && potentialLon2 <= 180) {
+                              latitudeInput.value = potentialLat2.toFixed(6);
+                              longitudeInput.value = potentialLon2.toFixed(6);
+                              displaySettingsFeedback("مختصات با موفقیت از کلیپ‌بورد جایگذاری شد (ترتیب معکوس شناسایی شد). نام مکان را بررسی و ذخیره کنید.", "success");
+                           } else {
+                               displaySettingsFeedback("مقادیر مختصات در کلیپ‌بورد نامعتبر یا خارج از محدوده هستند.", "warning");
+                           }
+                     }
+                 } else {
+                     displaySettingsFeedback("فرمت متن کلیپ‌بورد برای استخراج مختصات نامعتبر است. باید شامل دو عدد جدا شده با فاصله یا کاما باشد.", "warning");
+                 }
+             } catch (err) {
+                 console.error("Error reading clipboard:", err);
+                 let message = "خطا در خواندن کلیپ‌بورد.";
+                 if (err.name === 'NotAllowedError') { message = "دسترسی به کلیپ‌بورد توسط کاربر رد شد یا مرورگر اجازه نداد."; }
+                 else if (err.name === 'SecurityError') { message = "دسترسی به کلیپ‌بورد به دلایل امنیتی مسدود شد (HTTPS لازم است)."; }
+                 else if (err.message) { message += ` ${err.message}`; }
+                 displaySettingsFeedback(message, "danger");
+             }
+        });
+
+        getCurrentLocationBtn.addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                displaySettingsFeedback("مرورگر شما از قابلیت دریافت موقعیت مکانی پشتیبانی نمی‌کند.", "danger");
+                return;
+            }
+
+            displaySettingsFeedback("در حال دریافت موقعیت مکانی دستگاه...", "info");
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    latitudeInput.value = lat.toFixed(6);
+                    longitudeInput.value = lon.toFixed(6);
+                    displaySettingsFeedback("موقعیت مکانی دستگاه دریافت شد. نام مکان را بررسی و ذخیره کنید.", "success");
+                    // Optionally clear selection? No, let user decide to update or add new.
+                },
+                (error) => {
+                    let message = "خطا در دریافت موقعیت مکانی: ";
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED: message += "دسترسی به موقعیت مکانی رد شد."; break;
+                        case error.POSITION_UNAVAILABLE: message += "اطلاعات موقعیت مکانی در دسترس نیست."; break;
+                        case error.TIMEOUT: message += "زمان درخواست موقعیت مکانی تمام شد."; break;
+                        default: message += "خطای ناشناخته."; break;
+                    }
+                    console.error("Geolocation Error:", error);
+                    displaySettingsFeedback(message, "danger");
+                },
+                {
+                    enableHighAccuracy: false, // Faster, less battery drain
+                    timeout: 10000, // 10 seconds
+                    maximumAge: 60000 // Use cached position up to 1 minute old
+                }
+            );
+        });
+
+
+        // --- Initializations ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            applyTheme(currentSettings.theme);
+            populateLocationSelect(); // Populate dropdown first
+            updateSettingsInputsForSelectedLocation(); // Populate inputs based on selection
+
+            updateTime(); setInterval(updateTime, 1000);
+
+            if (currentSettings.selectedLocationId) {
+                fetchAndUpdateWeather(); // Fetch for the initially selected location
+            } else {
+                 // Handle case where no location is selected initially (e.g., empty storage)
+                 errorElement.textContent = 'هیچ مکانی انتخاب نشده است. لطفاً یک مکان را از تنظیمات انتخاب یا اضافه کنید.';
+                 errorElement.style.display = 'block';
+                 loadingElement.style.display = 'none';
+                 weatherContentElement.style.display = 'none';
+                 locationNameElement.textContent = 'مکان نامشخص';
+            }
+
+            // Set interval only if there's an initial location to update
+            if (currentSettings.selectedLocationId) {
+                 setInterval(fetchAndUpdateWeather, WEATHER_UPDATE_INTERVAL);
+            } else {
+                 console.log("Weather update interval not started - no initial location selected.");
+            }
+
+            // Auto-collapse settings on small screens initially? Optional.
+             // if (window.innerWidth < 768) {
+             //    $('#settingsCollapse').collapse('hide');
+             // }
+        });
+
+    </script>
+
+</body>
+</html>
